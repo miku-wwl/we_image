@@ -11,6 +11,8 @@
     "dependencies": {
         "@auth/drizzle-adapter": "^0.3.11",
         "@radix-ui/react-slot": "^1.0.2",
+        "@trpc/client": "^10.44.1",
+        "@trpc/server": "^10.44.1",
         "class-variance-authority": "^0.7.0",
         "clsx": "^2.0.0",
         "drizzle-kit": "^0.20.6",

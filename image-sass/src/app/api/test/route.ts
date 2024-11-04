@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { updateUserSchema } from "@/server/db/validate-schema";
 
 export function GET(request: NextRequest) {
