@@ -25,7 +25,7 @@ importers:
         version: 0.20.6
       drizzle-orm:
         specifier: ^0.29.1
-        version: 0.29.1(pg@8.11.3)(postgres@3.4.3)
+        version: 0.29.1(pg@8.10.0)(postgres@3.4.3)
       lucide-react:
         specifier: ^0.293.0
         version: 0.293.0(react@18.2.0)
@@ -36,8 +36,8 @@ importers:
         specifier: ^4.24.5
         version: 4.24.5(next@14.0.3)(react-dom@18.2.0)(react@18.2.0)
       pg:
-        specifier: ^8.11.3
-        version: 8.11.3
+        specifier: 8.10.0
+        version: 8.10.0
       postgres:
         specifier: ^3.4.3
         version: 3.4.3
@@ -1883,9 +1883,6 @@ packages:
     resolution: {integrity: sha512-gDKb8aZMDeD/tZWs9P6+q0J9Mwkdl6xMV8TjnGP3qJVJ06bdMgkbBlLU8IdfOsIsFz2BW1rNVT3XuNEl8zPAvw==}
     engines: {node: '>=8'}
 
-  pg-cloudflare@1.1.1:
-    resolution: {integrity: sha512-xWPagP/4B6BgFO+EKz3JONXv3YDgvkbVrGw2mTo3D6tVDQRh1e7cqVGvyR3BE+eQgAvx1XhW/iEASj4/jCWl3Q==}
-
   pg-connection-string@2.6.2:
     resolution: {integrity: sha512-ch6OwaeaPYcova4kKZ15sbJ2hKb/VP48ZD2gE7i1J+L4MspCtBMAx8nMgz7bksc7IojCIIWuEhHibSMFH8m8oA==}
 
@@ -1905,8 +1902,8 @@ packages:
     resolution: {integrity: sha512-qTAAlrEsl8s4OiEQY69wDvcMIdQN6wdz5ojQiOy6YRMuynxenON0O5oCpJI6lshc6scgAY8qvJ2On/p+CXY0GA==}
     engines: {node: '>=4'}
 
-  pg@8.11.3:
-    resolution: {integrity: sha512-+9iuvG8QfaaUrrph+kpF24cXkH1YOOUeArRNYIxq1viYHZagBxrTno7cecY1Fa44tJeZvaoG+Djpkc3JwehN5g==}
+  pg@8.10.0:
+    resolution: {integrity: sha512-ke7o7qSTMb47iwzOSaZMfeR7xToFdkE71ifIipOAAaLIM0DYzfOAXlgFFmYUIE2BcJtvnVlGCID84ZzCegE8CQ==}
     engines: {node: '>= 8.0.0'}
     peerDependencies:
       pg-native: '>=3.0.1'
@@ -3195,9 +3192,9 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  drizzle-orm@0.29.1(pg@8.11.3)(postgres@3.4.3):
+  drizzle-orm@0.29.1(pg@8.10.0)(postgres@3.4.3):
     dependencies:
-      pg: 8.11.3
+      pg: 8.10.0
       postgres: 3.4.3
 
   electron-to-chromium@1.4.594: {}
@@ -4209,16 +4206,13 @@ snapshots:
 
   path-type@4.0.0: {}
 
-  pg-cloudflare@1.1.1:
-    optional: true
-
   pg-connection-string@2.6.2: {}
 
   pg-int8@1.0.1: {}
 
-  pg-pool@3.6.1(pg@8.11.3):
+  pg-pool@3.6.1(pg@8.10.0):
     dependencies:
-      pg: 8.11.3
+      pg: 8.10.0
 
   pg-protocol@1.6.0: {}
 
@@ -4230,17 +4224,15 @@ snapshots:
       postgres-date: 1.0.7
       postgres-interval: 1.2.0
 
-  pg@8.11.3:
+  pg@8.10.0:
     dependencies:
       buffer-writer: 2.0.0
       packet-reader: 1.0.0
       pg-connection-string: 2.6.2
-      pg-pool: 3.6.1(pg@8.11.3)
+      pg-pool: 3.6.1(pg@8.10.0)
       pg-protocol: 1.6.0
       pg-types: 2.2.0
       pgpass: 1.0.5
-    optionalDependencies:
-      pg-cloudflare: 1.1.1
 
   pgpass@1.0.5:
     dependencies:
