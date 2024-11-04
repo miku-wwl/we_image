@@ -1,5 +1,5 @@
 import { getServerSession } from "@/server/auth";
-import { TRPCError, initTRPC } from "@trpc/server";
+import { TRPCError, createCallerFactory, initTRPC } from "@trpc/server";
 
 export async function createTRPCContext() {
     const session = await getServerSession();
@@ -52,3 +52,5 @@ export const testRouter = router({
 });
 
 export type TestRouter = typeof testRouter;
+
+export const serverCaller = createCallerFactory()(testRouter);
