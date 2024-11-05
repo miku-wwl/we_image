@@ -1,8 +1,8 @@
 "use client";
 
-import { Uppy } from "@uppy/core";
+import { Uppy, UppyFile, UploadSuccessCallback } from "@uppy/core";
 import AWSS3 from "@uppy/aws-s3";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useUppyState } from "./useUppyState";
 import { trpcPureClient } from "@/utils/api";
 import { Button } from "@/components/Button";
@@ -13,7 +13,6 @@ export default function Home() {
         uppy.use(AWSS3, {
             shouldUseMultipart: false,
             getUploadParameters(file) {
-                console.log(file);
                 return trpcPureClient.file.createPresignedUrl.mutate({
                     filename:
                         file.data instanceof File ? file.data.name : "test",
@@ -27,6 +26,23 @@ export default function Home() {
 
     const files = useUppyState(uppy, (s) => Object.values(s.files));
     const progress = useUppyState(uppy, (s) => s.totalProgress);
+
+    useEffect(() => {
+        const handler: UploadSuccessCallback<{}> = (file, resp) => {
+            if (file) {
+                trpcPureClient.file.saveFile.mutate({
+                    name: file.data instanceof File ? file.data.name : "test",
+                    path: resp.uploadURL ?? "",
+                    type: file.data.type,
+                });
+            }
+        };
+        uppy.on("upload-success", handler);
+
+        return () => {
+            uppy.off("upload-success", handler);
+        };
+    }, [uppy]);
 
     return (
         <div className="h-screen flex justify-center items-center">
