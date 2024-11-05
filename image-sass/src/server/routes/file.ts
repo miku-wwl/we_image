@@ -10,6 +10,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { files } from "../db/schema";
 import { db } from "../db/db";
 import { v4 as uuid } from "uuid";
+import { desc } from "drizzle-orm";
 
 const bucket = "test-image-1300216527";
 const apiEndpoint = "http://117.72.69.172:9000";
@@ -86,4 +87,12 @@ export const fileRoutes = router({
 
             return photo[0];
         }),
+
+    listFiles: protectedProcedure.query(async () => {
+        const result = await db.query.files.findMany({
+            orderBy: [desc(files.createdAt)],
+        });
+
+        return result;
+    }),
 });
