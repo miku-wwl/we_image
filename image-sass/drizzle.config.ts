@@ -6,7 +6,7 @@ export default defineConfig({
     host: "117.72.69.172",
     port: 5432,
     user: "postgres",
-    password: "123123",
+    password: "32110219miku#",
     database: "miku",
   },
   verbose: true,
