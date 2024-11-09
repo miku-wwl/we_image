@@ -3,10 +3,11 @@ import { cn } from "@/lib/utils";
 import { trpcClientReact, trpcPureClient, AppRouter } from "@/utils/api";
 import Uppy, { UploadCallback, UploadSuccessCallback } from "@uppy/core";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LocalFileItem, RemoteFileItem } from "./FileItem";
 import { inferRouterOutputs } from "@trpc/server";
 import { Button } from "../ui/Button";
+import { ScrollArea } from "../ui/ScrollArea";
 
 type FileResult = inferRouterOutputs<AppRouter>["file"]["listFiles"];
 
@@ -17,7 +18,7 @@ export function FileList({ uppy }: { uppy: Uppy }) {
         fetchNextPage,
     } = trpcClientReact.file.infinityQueryFiles.useInfiniteQuery(
         {
-            limit: 3,
+            limit: 10,
         },
         {
             getNextPageParam: (resp) => resp.nextCursor,
@@ -46,12 +47,26 @@ export function FileList({ uppy }: { uppy: Uppy }) {
                         type: file.data.type,
                     })
                     .then((resp) => {
-                        utils.file.listFiles.setData(void 0, (prev) => {
-                            if (!prev) {
-                                return prev;
+                        utils.file.infinityQueryFiles.setInfiniteData(
+                            { limit: 10 },
+                            (prev) => {
+                                if (!prev) {
+                                    return prev;
+                                }
+                                return {
+                                    ...prev,
+                                    pages: prev.pages.map((page, index) => {
+                                        if (index === 0) {
+                                            return {
+                                                ...page,
+                                                items: [resp, ...page.items],
+                                            };
+                                        }
+                                        return page;
+                                    }),
+                                };
                             }
-                            return [resp, ...prev];
-                        });
+                        );
                     });
             }
         };
@@ -80,10 +95,41 @@ export function FileList({ uppy }: { uppy: Uppy }) {
         };
     }, [uppy, utils]);
 
+    // ----------------------> intersection
+
+    const bottomRef = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (bottomRef.current) {
+            const observer = new IntersectionObserver(
+                (e) => {
+                    if (e[0].intersectionRatio > 0.1) {
+                        fetchNextPage();
+                    }
+                },
+                {
+                    threshold: 0.1,
+                }
+            );
+
+            observer.observe(bottomRef.current);
+            const element = bottomRef.current;
+
+            return () => {
+                observer.unobserve(element);
+                observer.disconnect();
+            };
+        }
+    }, [fetchNextPage]);
+
     return (
-        <>
+        <ScrollArea className="h-full">
             {isPending && <div>Loading</div>}
-            <div className={cn("flex flex-wrap gap-4 relative")}>
+            <div
+                className={cn(
+                    "flex flex-wrap justify-center gap-4 relative container"
+                )}
+            >
                 {uploadingFileIDs.length > 0 &&
                     uploadingFileIDs.map((id) => {
                         const file = uppyFiles[id];
@@ -114,9 +160,18 @@ export function FileList({ uppy }: { uppy: Uppy }) {
                         </div>
                     );
                 })}
-
-                <Button onClick={() => fetchNextPage()}>Load Next Page</Button>
             </div>
-        </>
+            <div
+                className={cn(
+                    " justify-center p-8 hidden",
+                    filesList.length > 0 && "flex"
+                )}
+                ref={bottomRef}
+            >
+                <Button variant="ghost" onClick={() => fetchNextPage()}>
+                    Load Next Page
+                </Button>
+            </div>
+        </ScrollArea>
     );
 }
