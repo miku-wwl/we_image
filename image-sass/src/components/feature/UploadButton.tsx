@@ -28,6 +28,7 @@ export function UploadButton({ uppy }: { uppy: Uppy }) {
                                 data: file,
                             });
                         });
+                        e.target.value = "";
                     }
                 }}
                 multiple
