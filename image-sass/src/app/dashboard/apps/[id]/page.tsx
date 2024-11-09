@@ -12,6 +12,7 @@ import { UploadPreview } from "@/components/feature/UploadPreview";
 import { FileList } from "@/components/feature/FileList";
 import { FilesOrderByColumn } from "@/server/routes/file";
 import { MoveUp, MoveDown } from "lucide-react";
+import Link from "next/link";
 
 export default function AppPage({
     params: { id: appId },
@@ -65,7 +66,12 @@ export default function AppPage({
                     Created At{" "}
                     {orderBy.order === "desc" ? <MoveUp /> : <MoveDown />}
                 </Button>
-                <UploadButton uppy={uppy}></UploadButton>
+                <div className="flex justify-center gap-2">
+                    <UploadButton uppy={uppy}></UploadButton>
+                    <Button asChild>
+                        <Link href="./new">new app</Link>
+                    </Button>
+                </div>
             </div>
 
             <Dropzone uppy={uppy} className=" relative h-[calc(100%-60px)]">

@@ -9,13 +9,11 @@ import {
 import { getServerSession } from "@/server/auth";
 import { redirect } from "next/navigation";
 
-export default async function DashboardLayout({
-    children,
-    nav,
-}: {
+export default async function DashboardLayout(props: {
     children: React.ReactNode;
     nav: React.ReactNode;
 }) {
+    const { children, nav } = props;
     const session = await getServerSession();
 
     if (!session?.user) {

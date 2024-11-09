@@ -14,10 +14,10 @@ import { and, asc, desc, eq, gt, isNull, lt, sql } from "drizzle-orm";
 import { filesCanOrderByColumns } from "../db/validate-schema";
 
 const bucket = "test-image-1300216527";
-const apiEndpoint = "https://cos.ap-nanjing.myqcloud.com";
+const apiEndpoint = "http://117.72.69.172:9000";
 const region = "ap-nanjing";
-const COS_APP_ID = "AKIDBLXrx051CNXktvy6KYio6LdzGnIh4fJs";
-const COS_APP_SECRET = "yrqsqvux45zmT9zqaIvSvKqGapyxpaXR";
+const COS_APP_ID = "1wZk5qSlnC3asfIBJbng";
+const COS_APP_SECRET = "BUXi60cz98DfKqvmdhVyCU7l90SmnLboQi18aWci";
 
 const filesOrderByColumnSchema = z
     .object({
