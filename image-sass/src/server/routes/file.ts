@@ -1,4 +1,4 @@
-import z from "zod";
+import z, { number } from "zod";
 import { protectedProcedure, router } from "../trpc";
 import { TRPCError } from "@trpc/server";
 import {
@@ -10,7 +10,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { files } from "../db/schema";
 import { db } from "../db/db";
 import { v4 as uuid } from "uuid";
-import { desc } from "drizzle-orm";
+import { desc, gt } from "drizzle-orm";
 
 const bucket = "test-image-1300216527";
 const apiEndpoint = "http://117.72.69.172:9000";
@@ -95,4 +95,28 @@ export const fileRoutes = router({
 
         return result;
     }),
+
+    infinityQueryFiles: protectedProcedure
+        .input(
+            z.object({
+                cursor: z.string().optional(),
+                limit: z.number().default(10),
+            })
+        )
+        .query(async ({ input }) => {
+            const { cursor, limit } = input;
+
+            const result = await db
+                .select()
+                .from(files)
+                .limit(limit)
+                .where(cursor ? gt(files.id, cursor) : undefined)
+                .orderBy(desc(files.createdAt));
+
+            return {
+                items: result,
+                nextCursor:
+                    result.length > 0 ? result[result.length - 1].id : null,
+            };
+        }),
 });
