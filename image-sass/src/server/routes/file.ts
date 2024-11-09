@@ -98,9 +98,10 @@ export const fileRoutes = router({
             return photo[0];
         }),
 
-    listFiles: protectedProcedure.query(async () => {
+    listFiles: protectedProcedure.query(async ({ ctx }) => {
         const result = await db.query.files.findMany({
             orderBy: [desc(files.createdAt)],
+            where: (files, { eq }) => eq(files.userId, ctx.session.user.id),
         });
 
         return result;
@@ -119,7 +120,7 @@ export const fileRoutes = router({
                 orderBy: filesOrderByColumnSchema,
             })
         )
-        .query(async ({ input }) => {
+        .query(async ({ input, ctx }) => {
             const {
                 cursor,
                 limit,
@@ -127,6 +128,7 @@ export const fileRoutes = router({
             } = input;
 
             const deletedFilter = isNull(files.deletedAt);
+            const userFilter = eq(files.userId, ctx.session.user.id);
 
             const statement = db
                 .select()
@@ -138,9 +140,10 @@ export const fileRoutes = router({
                               sql`("files"."created_at", "files"."id") < (${new Date(
                                   cursor.createdAt
                               ).toISOString()}, ${cursor.id})`,
-                              deletedFilter
+                              deletedFilter,
+                              userFilter
                           )
-                        : deletedFilter
+                        : and(userFilter, deletedFilter)
                 );
             // .orderBy(desc(files.createdAt));
 
