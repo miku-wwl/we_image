@@ -16,13 +16,16 @@ type FileResult = inferRouterOutputs<AppRouter>["file"]["listFiles"];
 export function FileList({
     uppy,
     orderBy,
+    appId,
 }: {
     uppy: Uppy;
     orderBy: FilesOrderByColumn;
+    appId: string;
 }) {
     const queryKey = {
         limit: 10,
         orderBy,
+        appId,
     };
 
     const {
@@ -59,6 +62,7 @@ export function FileList({
                             file.data instanceof File ? file.data.name : "test",
                         path: resp.uploadURL ?? "",
                         type: file.data.type,
+                        appId,
                     })
                     .then((resp) => {
                         utils.file.infinityQueryFiles.setInfiniteData(
@@ -172,6 +176,7 @@ export function FileList({
                 {uploadingFileIDs.length > 0 &&
                     uploadingFileIDs.map((id) => {
                         const file = uppyFiles[id];
+                        console.log(file)
 
                         return (
                             <div
