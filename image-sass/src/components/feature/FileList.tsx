@@ -9,6 +9,7 @@ import { inferRouterOutputs } from "@trpc/server";
 import { Button } from "../ui/Button";
 import { ScrollArea } from "../ui/ScrollArea";
 import { type FilesOrderByColumn } from "@/server/routes/file";
+import { CopyUrl, DeleteFile } from "./FileItemAction";
 
 type FileResult = inferRouterOutputs<AppRouter>["file"]["listFiles"];
 
@@ -19,19 +20,18 @@ export function FileList({
     uppy: Uppy;
     orderBy: FilesOrderByColumn;
 }) {
+    const queryKey = {
+        limit: 10,
+        orderBy,
+    };
+
     const {
         data: infinityQueryData,
         isPending,
         fetchNextPage,
-    } = trpcClientReact.file.infinityQueryFiles.useInfiniteQuery(
-        {
-            limit: 10,
-            orderBy,
-        },
-        {
-            getNextPageParam: (resp) => resp.nextCursor,
-        }
-    );
+    } = trpcClientReact.file.infinityQueryFiles.useInfiniteQuery(queryKey, {
+        getNextPageParam: (resp) => resp.nextCursor,
+    });
 
     const filesList = infinityQueryData
         ? infinityQueryData.pages.reduce((result, page) => {
@@ -56,7 +56,7 @@ export function FileList({
                     })
                     .then((resp) => {
                         utils.file.infinityQueryFiles.setInfiniteData(
-                            { limit: 10 },
+                            queryKey,
                             (prev) => {
                                 if (!prev) {
                                     return prev;
@@ -130,6 +130,26 @@ export function FileList({
         }
     }, [fetchNextPage]);
 
+    const handleFileDelete = (id: string) => {
+        utils.file.infinityQueryFiles.setInfiniteData(queryKey, (prev) => {
+            if (!prev) {
+                return prev;
+            }
+            return {
+                ...prev,
+                pages: prev.pages.map((page, index) => {
+                    if (index === 0) {
+                        return {
+                            ...page,
+                            items: page.items.filter((item) => item.id !== id),
+                        };
+                    }
+                    return page;
+                }),
+            };
+        });
+    };
+
     return (
         <ScrollArea className="h-full">
             {isPending && <div>Loading</div>}
@@ -158,8 +178,15 @@ export function FileList({
                     return (
                         <div
                             key={file.id}
-                            className=" w-56 h-56 flex justify-center items-center border"
+                            className=" w-56 h-56 flex relative justify-center items-center border"
                         >
+                            <div className="inset-0 absolute bg-background/30 opacity-0 hover:opacity-100 transition-all justify-center items-center flex">
+                                <CopyUrl url={file.url}></CopyUrl>
+                                <DeleteFile
+                                    fileId={file.id}
+                                    onDeleteSuccess={handleFileDelete}
+                                ></DeleteFile>
+                            </div>
                             <RemoteFileItem
                                 contentType={file.contentType}
                                 url={file.url}

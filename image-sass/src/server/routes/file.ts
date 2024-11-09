@@ -10,7 +10,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { files } from "../db/schema";
 import { db } from "../db/db";
 import { v4 as uuid } from "uuid";
-import { asc, desc, gt, lt, sql } from "drizzle-orm";
+import { and, asc, desc, eq, gt, isNull, lt, sql } from "drizzle-orm";
 import { filesCanOrderByColumns } from "../db/validate-schema";
 
 const bucket = "test-image-1300216527";
@@ -126,16 +126,21 @@ export const fileRoutes = router({
                 orderBy = { field: "createdAt", order: "desc" },
             } = input;
 
+            const deletedFilter = isNull(files.deletedAt);
+
             const statement = db
                 .select()
                 .from(files)
                 .limit(limit)
                 .where(
                     cursor
-                        ? sql`("files"."created_at", "files"."id") < (${new Date(
-                              cursor.createdAt
-                          ).toISOString()}, ${cursor.id})`
-                        : undefined
+                        ? and(
+                              sql`("files"."created_at", "files"."id") < (${new Date(
+                                  cursor.createdAt
+                              ).toISOString()}, ${cursor.id})`,
+                              deletedFilter
+                          )
+                        : deletedFilter
                 );
             // .orderBy(desc(files.createdAt));
 
@@ -157,5 +162,16 @@ export const fileRoutes = router({
                           }
                         : null,
             };
+        }),
+
+    deleteFile: protectedProcedure
+        .input(z.string())
+        .mutation(async ({ ctx, input }) => {
+            return db
+                .update(files)
+                .set({
+                    deletedAt: new Date(),
+                })
+                .where(eq(files.id, input));
         }),
 });

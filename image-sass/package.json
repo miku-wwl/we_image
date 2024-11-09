@@ -25,6 +25,7 @@
         "@uppy/core": "^3.8.0",
         "class-variance-authority": "^0.7.0",
         "clsx": "^2.0.0",
+        "copy-to-clipboard": "^3.3.3",
         "drizzle-kit": "^0.20.6",
         "drizzle-orm": "^0.29.1",
         "drizzle-zod": "^0.5.1",
