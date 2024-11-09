@@ -29,9 +29,12 @@ export function FileList({
         data: infinityQueryData,
         isPending,
         fetchNextPage,
-    } = trpcClientReact.file.infinityQueryFiles.useInfiniteQuery(queryKey, {
-        getNextPageParam: (resp) => resp.nextCursor,
-    });
+    } = trpcClientReact.file.infinityQueryFiles.useInfiniteQuery(
+        { ...queryKey },
+        {
+            getNextPageParam: (resp) => resp.nextCursor,
+        }
+    );
 
     const filesList = infinityQueryData
         ? infinityQueryData.pages.reduce((result, page) => {
@@ -56,7 +59,7 @@ export function FileList({
                     })
                     .then((resp) => {
                         utils.file.infinityQueryFiles.setInfiniteData(
-                            queryKey,
+                            { ...queryKey },
                             (prev) => {
                                 if (!prev) {
                                     return prev;
@@ -131,23 +134,28 @@ export function FileList({
     }, [fetchNextPage]);
 
     const handleFileDelete = (id: string) => {
-        utils.file.infinityQueryFiles.setInfiniteData(queryKey, (prev) => {
-            if (!prev) {
-                return prev;
+        utils.file.infinityQueryFiles.setInfiniteData(
+            { ...queryKey },
+            (prev) => {
+                if (!prev) {
+                    return prev;
+                }
+                return {
+                    ...prev,
+                    pages: prev.pages.map((page, index) => {
+                        if (index === 0) {
+                            return {
+                                ...page,
+                                items: page.items.filter(
+                                    (item) => item.id !== id
+                                ),
+                            };
+                        }
+                        return page;
+                    }),
+                };
             }
-            return {
-                ...prev,
-                pages: prev.pages.map((page, index) => {
-                    if (index === 0) {
-                        return {
-                            ...page,
-                            items: page.items.filter((item) => item.id !== id),
-                        };
-                    }
-                    return page;
-                }),
-            };
-        });
+        );
     };
 
     return (
