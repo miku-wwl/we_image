@@ -33,6 +33,9 @@ export function FileList({
         { ...queryKey },
         {
             getNextPageParam: (resp) => resp.nextCursor,
+            refetchOnWindowFocus: false,
+            refetchOnMount: false,
+            refetchOnReconnect: false,
         }
     );
 

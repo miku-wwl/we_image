@@ -12,6 +12,7 @@ import { UploadPreview } from "@/components/feature/UploadPreview";
 import { FileList } from "@/components/feature/FileList";
 import { FilesOrderByColumn } from "@/server/routes/file";
 import { MoveUp, MoveDown } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
     const [uppy] = useState(() => {
@@ -48,7 +49,7 @@ export default function Home() {
     });
 
     return (
-        <div className="mx-auto h-screen">
+        <div className="mx-auto h-full">
             <div className="container flex justify-between items-center h-[60px]">
                 <Button
                     onClick={() => {
@@ -62,6 +63,7 @@ export default function Home() {
                     {orderBy.order === "desc" ? <MoveUp /> : <MoveDown />}
                 </Button>
                 <UploadButton uppy={uppy}></UploadButton>
+                <Link href="/dashboard/a">AAA</Link>
             </div>
 
             <Dropzone uppy={uppy} className=" relative h-[calc(100%-60px)]">
