@@ -70,12 +70,14 @@ export const fileRoutes = router({
                 method: "PUT" as const,
             };
         }),
+
     saveFile: protectedProcedure
         .input(
             z.object({
                 name: z.string(),
                 path: z.string(),
                 type: z.string(),
+                appId: z.string(),
             })
         )
         .mutation(async ({ ctx, input }) => {
@@ -98,14 +100,20 @@ export const fileRoutes = router({
             return photo[0];
         }),
 
-    listFiles: protectedProcedure.query(async ({ ctx }) => {
-        const result = await db.query.files.findMany({
-            orderBy: [desc(files.createdAt)],
-            where: (files, { eq }) => eq(files.userId, ctx.session.user.id),
-        });
+    listFiles: protectedProcedure
+        .input(z.object({ appId: z.string() }))
+        .query(async ({ ctx, input }) => {
+            const result = await db.query.files.findMany({
+                orderBy: [desc(files.createdAt)],
+                where: (files, { eq }) =>
+                    and(
+                        eq(files.userId, ctx.session.user.id),
+                        eq(files.appId, input.appId)
+                    ),
+            });
 
-        return result;
-    }),
+            return result;
+        }),
 
     infinityQueryFiles: protectedProcedure
         .input(
@@ -118,6 +126,7 @@ export const fileRoutes = router({
                     .optional(),
                 limit: z.number().default(10),
                 orderBy: filesOrderByColumnSchema,
+                appId: z.string(),
             })
         )
         .query(async ({ input, ctx }) => {
@@ -129,6 +138,7 @@ export const fileRoutes = router({
 
             const deletedFilter = isNull(files.deletedAt);
             const userFilter = eq(files.userId, ctx.session.user.id);
+            const appFilter = eq(files.appId, input.appId);
 
             const statement = db
                 .select()
@@ -141,9 +151,10 @@ export const fileRoutes = router({
                                   cursor.createdAt
                               ).toISOString()}, ${cursor.id})`,
                               deletedFilter,
-                              userFilter
+                              userFilter,
+                              appFilter
                           )
-                        : and(userFilter, deletedFilter)
+                        : and(userFilter, deletedFilter, appFilter)
                 );
             // .orderBy(desc(files.createdAt));
 
