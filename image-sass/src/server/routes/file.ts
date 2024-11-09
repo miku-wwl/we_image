@@ -10,7 +10,7 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { files } from "../db/schema";
 import { db } from "../db/db";
 import { v4 as uuid } from "uuid";
-import { desc, gt } from "drizzle-orm";
+import { desc, gt, lt, sql } from "drizzle-orm";
 
 const bucket = "test-image-1300216527";
 const apiEndpoint = "http://117.72.69.172:9000";
@@ -99,7 +99,12 @@ export const fileRoutes = router({
     infinityQueryFiles: protectedProcedure
         .input(
             z.object({
-                cursor: z.string().optional(),
+                cursor: z
+                    .object({
+                        id: z.string(),
+                        createdAt: z.string(),
+                    })
+                    .optional(),
                 limit: z.number().default(10),
             })
         )
@@ -110,13 +115,24 @@ export const fileRoutes = router({
                 .select()
                 .from(files)
                 .limit(limit)
-                .where(cursor ? gt(files.id, cursor) : undefined)
+                .where(
+                    cursor
+                        ? sql`("files"."created_at", "files"."id") < (${new Date(
+                              cursor.createdAt
+                          ).toISOString()}, ${cursor.id})`
+                        : undefined
+                )
                 .orderBy(desc(files.createdAt));
 
             return {
                 items: result,
                 nextCursor:
-                    result.length > 0 ? result[result.length - 1].id : null,
+                    result.length > 0
+                        ? {
+                              createdAt: result[result.length - 1].createdAt!,
+                              id: result[result.length - 1].id,
+                          }
+                        : null,
             };
         }),
 });

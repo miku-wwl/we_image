@@ -17,7 +17,7 @@ export function FileList({ uppy }: { uppy: Uppy }) {
         fetchNextPage,
     } = trpcClientReact.file.infinityQueryFiles.useInfiniteQuery(
         {
-            limit: 10,
+            limit: 3,
         },
         {
             getNextPageParam: (resp) => resp.nextCursor,
