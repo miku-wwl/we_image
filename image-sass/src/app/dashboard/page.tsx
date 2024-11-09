@@ -10,7 +10,7 @@ import { UploadButton } from "@/components/feature/UploadButton";
 import Image from "next/image";
 import { Dropzone } from "@/components/feature/Dropzone";
 import { cn } from "@/lib/utils";
-import { log } from "console";
+import { usePasteFile } from "@/hooks/usePasteFile";
 
 export default function Home() {
     const [uppy] = useState(() => {
@@ -52,10 +52,19 @@ export default function Home() {
     const { data: fileList, isPending } =
         trpcClientReact.file.listFiles.useQuery();
 
+    usePasteFile({
+        onFilesPaste: (files) => {
+            uppy.addFiles(
+                files.map((file) => ({
+                    data: file,
+                }))
+            );
+        },
+    });
+
     return (
         <div className="container mx-auto p-2">
-            <div>
-                <UploadButton uppy={uppy}></UploadButton>
+            <div className="flex justify-between items-center mb-4">
                 <Button
                     onClick={() => {
                         uppy.upload();
@@ -63,6 +72,7 @@ export default function Home() {
                 >
                     Upload
                 </Button>
+                <UploadButton uppy={uppy}></UploadButton>
             </div>
             {isPending && <div>Loading</div>}
             <Dropzone uppy={uppy}>
@@ -82,7 +92,7 @@ export default function Home() {
                             {fileList?.map((file) => {
                                 const isImage =
                                     file.contentType.startsWith("image");
-                                    
+
                                 return (
                                     <div
                                         key={file.id}
