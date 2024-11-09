@@ -10,13 +10,23 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { files } from "../db/schema";
 import { db } from "../db/db";
 import { v4 as uuid } from "uuid";
-import { desc, gt, lt, sql } from "drizzle-orm";
+import { asc, desc, gt, lt, sql } from "drizzle-orm";
+import { filesCanOrderByColumns } from "../db/validate-schema";
 
 const bucket = "test-image-1300216527";
 const apiEndpoint = "http://117.72.69.172:9000";
 const region = "ap-nanjing";
 const COS_APP_ID = "1wZk5qSlnC3asfIBJbng";
 const COS_APP_SECRET = "BUXi60cz98DfKqvmdhVyCU7l90SmnLboQi18aWci";
+
+const filesOrderByColumnSchema = z
+    .object({
+        field: filesCanOrderByColumns.keyof(),
+        order: z.enum(["desc", "asc"]),
+    })
+    .optional();
+
+export type FilesOrderByColumn = z.infer<typeof filesOrderByColumnSchema>;
 
 export const fileRoutes = router({
     createPresignedUrl: protectedProcedure
@@ -106,12 +116,17 @@ export const fileRoutes = router({
                     })
                     .optional(),
                 limit: z.number().default(10),
+                orderBy: filesOrderByColumnSchema,
             })
         )
         .query(async ({ input }) => {
-            const { cursor, limit } = input;
+            const {
+                cursor,
+                limit,
+                orderBy = { field: "createdAt", order: "desc" },
+            } = input;
 
-            const result = await db
+            const statement = db
                 .select()
                 .from(files)
                 .limit(limit)
@@ -121,8 +136,16 @@ export const fileRoutes = router({
                               cursor.createdAt
                           ).toISOString()}, ${cursor.id})`
                         : undefined
-                )
-                .orderBy(desc(files.createdAt));
+                );
+            // .orderBy(desc(files.createdAt));
+
+            statement.orderBy(
+                orderBy.order === "desc"
+                    ? desc(files[orderBy.field])
+                    : asc(files[orderBy.field])
+            );
+
+            const result = await statement;
 
             return {
                 items: result,
