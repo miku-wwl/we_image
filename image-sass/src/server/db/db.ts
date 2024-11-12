@@ -7,4 +7,4 @@ import * as schema from "./schema";
 const queryClient = postgres(
     "postgres://postgres:32110219miku123@117.72.69.172:5432/miku"
 );
-export const db = drizzle(queryClient, { schema });
+export const db = drizzle(queryClient, { schema, logger: true });
