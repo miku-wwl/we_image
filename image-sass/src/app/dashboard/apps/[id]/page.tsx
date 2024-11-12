@@ -73,7 +73,7 @@ export default function AppPage({
                         <Link href="./new">new app</Link>
                     </Button>
                     <Button asChild>
-                        <Link href={`/dashboard/apps/${appId}/storage`}>
+                        <Link href={`/dashboard/apps/${appId}/setting/storage`}>
                             <Settings></Settings>
                         </Link>
                     </Button>

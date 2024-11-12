@@ -1,6 +1,8 @@
 import { getServerSession } from "@/server/auth";
 import { TRPCError, createCallerFactory, initTRPC } from "@trpc/server";
 import { Session } from "next-auth";
+import { headers } from "next/headers";
+import { db } from "./db/db";
 
 // export async function createTRPCContext() {
 //     const session = await getServerSession();
@@ -49,5 +51,42 @@ export const protectedProcedure = withLoggerProcedure
             },
         });
     });
+
+export const withAppProcedure = withLoggerProcedure.use(async ({ next }) => {
+    const header = headers();
+
+    const apiKey = header.get("api-key");
+
+    if (!apiKey) {
+        throw new TRPCError({
+            code: "FORBIDDEN",
+        });
+    }
+
+    const apiKeyAndAppUser = await db.query.apiKeys.findFirst({
+        where: (apiKeys, { eq, and, isNotNull }) =>
+            and(eq(apiKeys.key, apiKey), isNotNull(apiKeys.deletedAt)),
+        with: {
+            app: {
+                with: {
+                    user: true,
+                },
+            },
+        },
+    });
+
+    if (!apiKeyAndAppUser) {
+        throw new TRPCError({
+            code: "NOT_FOUND",
+        });
+    }
+
+    return next({
+        ctx: {
+            app: apiKeyAndAppUser.app,
+            user: apiKeyAndAppUser.app.user,
+        },
+    });
+});
 
 export { router };
