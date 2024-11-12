@@ -4,14 +4,9 @@ import {
     GetObjectCommandInput,
     S3Client,
 } from "@aws-sdk/client-s3";
+import { TRPCError } from "@trpc/server";
 import { NextRequest, NextResponse } from "next/server";
 import sharp from "sharp";
-
-const bucket = "test-image-1300216527";
-const apiEndpoint = "http://117.72.69.172:9000";
-const region = "ap-nanjing";
-const COS_APP_ID = "1wZk5qSlnC3asfIBJbng";
-const COS_APP_SECRET = "BUXi60cz98DfKqvmdhVyCU7l90SmnLboQi18aWci";
 
 export async function GET(
     request: NextRequest,
@@ -19,7 +14,22 @@ export async function GET(
 ) {
     const file = await db.query.files.findFirst({
         where: (files, { eq }) => eq(files.id, id),
+        with: {
+            app: {
+                with: {
+                    storage: true,
+                },
+            },
+        },
     });
+
+    if (!file?.app.storage) {
+        throw new TRPCError({
+            code: "BAD_REQUEST",
+        });
+    }
+
+    const storage = file.app.storage.configuration;
 
     if (!file || !file.contentType.startsWith("image")) {
         return new NextResponse("", {
@@ -28,16 +38,16 @@ export async function GET(
     }
 
     const params: GetObjectCommandInput = {
-        Bucket: bucket,
+        Bucket: storage.bucket,
         Key: file.path,
     };
 
     const s3Client = new S3Client({
-        endpoint: apiEndpoint,
-        region: region,
+        endpoint: storage.apiEndpoint,
+        region: storage.region,
         credentials: {
-            accessKeyId: COS_APP_ID,
-            secretAccessKey: COS_APP_SECRET,
+            accessKeyId: storage.accessKeyId,
+            secretAccessKey: storage.secretAccessKey,
         },
     });
 

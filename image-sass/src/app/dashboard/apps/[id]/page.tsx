@@ -29,6 +29,7 @@ export default function AppPage({
                         file.data instanceof File ? file.data.name : "test",
                     contentType: file.data.type || "",
                     size: file.size,
+                    appId: appId,
                 });
             },
         });
