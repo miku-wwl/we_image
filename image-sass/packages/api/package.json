@@ -1,0 +1,21 @@
+{
+    "name": "@image-sass/api",
+    "version": "0.0.1",
+    "main": "dist/index.ts",
+    "type": "module",
+    "scripts": {
+        "build": "tsc"
+    },
+    "files": [
+        "dist"
+    ],
+    "devDependencies": {
+        "@trpc/client": "11.0.0-next-alpha.149"
+    },
+    "peerDependencies": {
+        "@trpc/client": "11.0.0-next-alpha.149"
+    },
+    "dependencies": {
+        "@image-sass/api": "file:"
+    }
+}
