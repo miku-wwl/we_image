@@ -35,6 +35,7 @@ export const apiKeysRouter = router({
                     name: input.name,
                     appId: input.appId,
                     key: uuid(),
+                    clientId: uuid(),
                 })
                 .returning();
 

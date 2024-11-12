@@ -6,13 +6,18 @@
 import { createApiClient } from "@image-sass/api";
 import { onMounted } from "vue";
 
-const apiClient = createApiClient({ apiKey: "asd" });
+onMounted(async () => {
+    const tokenResp = await fetch("/api/test");
+    const token = await tokenResp.text();
 
-onMounted(() => {
+    console.log(token)
+    
+    const apiClient = createApiClient({ signedToken: token });
+
     apiClient.file.createPresignedUrl.mutate({
-        filename: "Screenshot 2023-06-20 200151.png",
+        filename: "1.png",
         contentType: "image/png",
-        size: 18105,
+        size: 34105,
         appId: "61f2ef8d-1126-4e78-9020-cfd23b50c59b",
     });
 });

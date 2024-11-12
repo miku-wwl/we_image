@@ -123,8 +123,9 @@ export declare const apiClient: {
         };
     };
 };
-export declare const createApiClient: ({ apiKey }: {
-    apiKey: string;
+export declare const createApiClient: ({ apiKey, signedToken, }: {
+    apiKey?: string | undefined;
+    signedToken?: string | undefined;
 }) => {
     file: {
         createPresignedUrl: {

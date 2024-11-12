@@ -3,6 +3,7 @@ import { TRPCError, createCallerFactory, initTRPC } from "@trpc/server";
 import { Session } from "next-auth";
 import { headers } from "next/headers";
 import { db } from "./db/db";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
 // export async function createTRPCContext() {
 //     const session = await getServerSession();
@@ -56,37 +57,93 @@ export const withAppProcedure = withLoggerProcedure.use(async ({ next }) => {
     const header = headers();
 
     const apiKey = header.get("api-key");
+    const signedToken = header.get("signed-token");
 
-    if (!apiKey) {
-        throw new TRPCError({
-            code: "FORBIDDEN",
-        });
-    }
+    console.log("apiKey")
+    console.log(apiKey)
+    console.log("signedToken")
+    console.log(signedToken)
 
-    const apiKeyAndAppUser = await db.query.apiKeys.findFirst({
-        where: (apiKeys, { eq, and, isNull }) =>
-            and(eq(apiKeys.key, apiKey), isNull(apiKeys.deletedAt)),
-        with: {
-            app: {
-                with: {
-                    user: true,
-                    storage: true,
+    if (apiKey) {
+        const apiKeyAndAppUser = await db.query.apiKeys.findFirst({
+            where: (apiKeys, { eq, and, isNull }) =>
+                and(eq(apiKeys.key, apiKey), isNull(apiKeys.deletedAt)),
+            with: {
+                app: {
+                    with: {
+                        user: true,
+                        storage: true,
+                    },
                 },
             },
-        },
-    });
+        });
 
-    if (!apiKeyAndAppUser) {
-        throw new TRPCError({
-            code: "NOT_FOUND",
+        console.log("apiKeyAndAppUser")
+        console.log("apiKeyAndAppUser")
+        console.log("")
+        console.log(apiKeyAndAppUser)
+        
+        if (!apiKeyAndAppUser) {
+            throw new TRPCError({
+                code: "NOT_FOUND",
+            });
+        }
+
+        return next({
+            ctx: {
+                app: apiKeyAndAppUser.app,
+                user: apiKeyAndAppUser.app.user,
+            },
+        });
+    } else if (signedToken) {
+        const payload = jwt.decode(signedToken);
+
+        if (!(payload as JwtPayload)?.clientId) {
+            throw new TRPCError({
+                code: "BAD_REQUEST",
+                message: "clientId not found",
+            });
+        }
+
+        const apiKeyAndAppUser = await db.query.apiKeys.findFirst({
+            where: (apiKeys, { eq, and, isNull }) =>
+                and(
+                    eq(apiKeys.clientId, (payload as JwtPayload).clientId),
+                    isNull(apiKeys.deletedAt)
+                ),
+            with: {
+                app: {
+                    with: {
+                        user: true,
+                        storage: true,
+                    },
+                },
+            },
+        });
+        
+
+        if (!apiKeyAndAppUser) {
+            throw new TRPCError({
+                code: "NOT_FOUND",
+            });
+        }
+
+        try {
+            jwt.verify(signedToken, apiKeyAndAppUser.key);
+        } catch (err) {
+            throw new TRPCError({ code: "BAD_REQUEST" });
+        }
+
+        return next({
+            ctx: {
+                app: apiKeyAndAppUser.app,
+                user: apiKeyAndAppUser.app.user,
+            },
         });
     }
 
-    return next({
-        ctx: {
-            app: apiKeyAndAppUser.app,
-            user: apiKeyAndAppUser.app.user,
-        },
+    throw new TRPCError({
+        code: "FORBIDDEN",
     });
 });
 
