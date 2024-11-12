@@ -5,8 +5,6 @@ export default function AppLayout({
     children: React.ReactNode;
     intercepting: React.ReactNode;
 }) {
-    console.log(children, intercepting);
-
     return (
         <>
             {children}

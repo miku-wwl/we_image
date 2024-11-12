@@ -117,6 +117,7 @@ export const appRelations = relations(apps, ({ one, many }) => ({
         references: [storageConfiguration.id],
     }),
     files: many(files),
+    apiKeys: many(apiKeys),
 }));
 
 export type S3StorageConfiguration = {
@@ -149,3 +150,19 @@ export const storageConfigurationRelation = relations(
         }),
     })
 );
+
+export const apiKeys = pgTable("apiKeys", {
+    id: serial("id").primaryKey(),
+    name: varchar("name", { length: 255 }).notNull(),
+    key: varchar("key", { length: 100 }).notNull(),
+    appId: varchar("appId", { length: 100 }).notNull(),
+    createdAt: timestamp("created_at", { mode: "date" }).defaultNow(),
+    deletedAt: timestamp("deleted_at", { mode: "date" }),
+});
+
+export const apiKeysRelation = relations(apiKeys, ({ one }) => ({
+    app: one(apps, {
+        fields: [apiKeys.appId],
+        references: [apps.id],
+    }),
+}));
