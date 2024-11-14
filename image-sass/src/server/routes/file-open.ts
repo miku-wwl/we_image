@@ -29,7 +29,6 @@ export const fileOpenRoutes = router({
                 filename: z.string(),
                 contentType: z.string(),
                 size: z.number(),
-                appId: z.string(),
             })
         )
         .mutation(async ({ ctx, input }) => {
@@ -88,11 +87,10 @@ export const fileOpenRoutes = router({
                 name: z.string(),
                 path: z.string(),
                 type: z.string(),
-                appId: z.string(),
             })
         )
         .mutation(async ({ ctx, input }) => {
-            const { user } = ctx;
+            const { user, app } = ctx;
 
             const url = new URL(input.path);
 
@@ -100,6 +98,7 @@ export const fileOpenRoutes = router({
                 .insert(files)
                 .values({
                     ...input,
+                    appId: app.id,
                     id: uuid(),
                     path: url.pathname,
                     url: url.toString(),

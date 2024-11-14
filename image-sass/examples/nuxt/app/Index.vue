@@ -1,30 +1,36 @@
 <template>
     <div>
-        <VueUploadButton> asdasd </VueUploadButton>
+        <VueUploadButton :onFileUploaded="onFileUploaded" :uploader="uploader">
+            asdasd
+        </VueUploadButton>
+        <img :src="uploaded" />
     </div>
 </template>
 
 <script setup>
 import { createApiClient } from "@image-sass/api";
 import { onMounted, ref, watchEffect } from "vue";
-import { UploadButton } from "@image-saas/upload-button";
+import { UploadButtonWithUploader } from "@image-saas/upload-button";
 import { connect } from "@image-saas/preact-vue-connect";
+import { createUploader } from "@image-saas/uploader";
 
-const VueUploadButton = connect(UploadButton);
+const VueUploadButton = connect(UploadButtonWithUploader);
 
-onMounted(async () => {
+const uploader = createUploader(async (file) => {
     const tokenResp = await fetch("/api/test");
     const token = await tokenResp.text();
 
-    console.log(token)
-
     const apiClient = createApiClient({ signedToken: token });
-
-    apiClient.file.createPresignedUrl.mutate({
-        filename: "1.png",
-        contentType: "image/png",
-        size: 34105,
-        appId: "61f2ef8d-1126-4e78-9020-cfd23b50c59b",
+    return apiClient.file.createPresignedUrl.mutate({
+        filename: file.data instanceof File ? file.data.name : "test",
+        contentType: file.data.type || "",
+        size: file.size,
     });
 });
+
+const uploaded = ref("");
+
+function onFileUploaded(url) {
+    uploaded.value = url;
+}
 </script>

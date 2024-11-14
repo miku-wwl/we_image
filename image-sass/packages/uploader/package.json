@@ -1,0 +1,26 @@
+{
+    "name": "@image-saas/uploader",
+    "version": "0.0.1",
+    "module": "dist/index.js",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "type": "module",
+    "scripts": {
+        "build": "tsc"
+    },
+    "files": [
+        "dist",
+        "package.json"
+    ],
+    "devDependencies": {
+        "@uppy/aws-s3": "^3.6.0",
+        "@uppy/core": "^3.8.0"
+    },
+    "peerDependencies": {
+        "@uppy/aws-s3": "^3.6.0",
+        "@uppy/core": "^3.8.0"
+    },
+    "dependencies": {
+        "@image-saas/uploader": "file:"
+    }
+}
