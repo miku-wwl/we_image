@@ -1,17 +1,23 @@
 <template>
-    <div>Hello World</div>
+    <div>
+        <VueUploadButton> asdasd </VueUploadButton>
+    </div>
 </template>
 
 <script setup>
 import { createApiClient } from "@image-sass/api";
-import { onMounted } from "vue";
+import { onMounted, ref, watchEffect } from "vue";
+import { UploadButton } from "@image-saas/upload-button";
+import { connect } from "@image-saas/preact-vue-connect";
+
+const VueUploadButton = connect(UploadButton);
 
 onMounted(async () => {
     const tokenResp = await fetch("/api/test");
     const token = await tokenResp.text();
 
     console.log(token)
-    
+
     const apiClient = createApiClient({ signedToken: token });
 
     apiClient.file.createPresignedUrl.mutate({
