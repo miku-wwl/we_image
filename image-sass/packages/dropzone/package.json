@@ -1,0 +1,29 @@
+{
+    "name": "@image-saas/dropzone",
+    "version": "0.0.1",
+    "module": "dist/dropzone.js",
+    "main": "dist/dropzone.cjs",
+    "types": "dist/index.d.ts",
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "build:dts": "tsup lib/index.ts --dts-only --format esm",
+        "dev": "vite"
+    },
+    "files": [
+        "dist",
+        "package.json"
+    ],
+    "devDependencies": {
+        "preact": "^10.19.3",
+        "vite": "^5.0.12",
+        "@preact/preset-vite": "^2.7.0",
+        "typescript": "^5.2.2",
+        "tsup": "^8.0.1",
+        "@uppy/core": "^3.8.0"
+    },
+    "peerDependencies": {
+        "preact": "^10.19.3",
+        "@uppy/core": "^3.8.0"
+    }
+}
