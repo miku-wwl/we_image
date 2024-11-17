@@ -1,9 +1,13 @@
-import { UploadButton } from "../lib/Dropzone";
+import { Dropzone } from "../lib/Dropzone";
 
 export function App() {
     return (
         <>
-            <UploadButton></UploadButton>
+            <Dropzone
+                style={{ width: 200, height: 200, backgroundColor: "red" }}
+                setChildrenContainer={() => {}}
+                onDraggingChange={() => {}}
+            ></Dropzone>
         </>
     );
 }

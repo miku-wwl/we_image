@@ -1,4 +1,7 @@
 import { render } from "preact";
-import { App } from "./app.jsx";
+import { Dropzone } from "../lib/Dropzone.js";
 
-render(<App />, document.getElementById("app")!);
+render(
+    <Dropzone onDraggingChange={() => {}} onFileChosed={() => {}} />,
+    document.getElementById("app")!
+);

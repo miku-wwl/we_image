@@ -1,6 +1,5 @@
-import { useRef, useState } from "preact/hooks";
+import { useRef, useState, useEffect } from "preact/hooks";
 import type { HTMLAttributes, ReactNode } from "preact/compat";
-import { useEffect } from "react";
 
 type CommonPreactComponentProps = {
     setChildrenContainer: (ele: HTMLElement | null) => void;
@@ -22,6 +21,8 @@ export function Dropzone({
 }: DropzoneProps) {
     const [darging, setDragging] = useState(false);
     const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    console.log(darging, setDragging);
 
     useEffect(() => {
         onDraggingChange(darging);
