@@ -5,7 +5,7 @@
         </VueUploadButton> -->
         <VueDropzone
             :onFileUploaded="onFileUploaded"
-            :onDraggingChanged="onDraggingChanged"
+            :onDraggingChange="onDraggingChanged"
             :uploader="uploader"
             :style="{ width: 200, height: 200, background: 'red' }"
         >
