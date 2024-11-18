@@ -5,11 +5,10 @@ export default defineNuxtConfig({
     devServer: {
         port: 3456,
     },
-    vite: {
-        plugins: [preact()],
+    // vite: {
         // optimizeDeps: {
         //     exclude: ["preact"],
         //     force: true,
         // },
-    },
+    // },
 });

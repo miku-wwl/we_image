@@ -21,8 +21,6 @@
         "preact": "^10.19.3",
         "@trpc/client": "11.0.0-next-alpha.149",
         "jsonwebtoken": "^9.0.2",
-        "@types/jsonwebtoken": "^9.0.5",
-        "vite-bundle-visualizer": "^1.0.1",
-        "@preact/preset-vite": "^2.7.0"
+        "@types/jsonwebtoken": "^9.0.5"
     }
 }
