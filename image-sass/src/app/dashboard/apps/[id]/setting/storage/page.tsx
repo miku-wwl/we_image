@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/Button";
 import { trpcClientReact } from "@/utils/api";
 import { Plus } from "lucide-react";
+import Link from "next/link";
 
 export default function StoragePage({
     params: { id },
@@ -40,8 +41,10 @@ export default function StoragePage({
         <div className="pt-10">
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl mb-6">Storage</h1>
-                <Button>
-                    <Plus></Plus>
+                <Button asChild>
+                    <Link href={`/dashboard/apps/${id}/setting/storage/new`}>
+                        <Plus></Plus>
+                    </Link>
                 </Button>
             </div>
             {storages?.map((storage) => {
