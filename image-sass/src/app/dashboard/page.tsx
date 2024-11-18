@@ -1,85 +1,61 @@
 "use client";
 
-import { Uppy } from "@uppy/core";
-import AWSS3 from "@uppy/aws-s3";
-import { useState } from "react";
-import { trpcPureClient } from "@/utils/api";
-import { Button } from "@/components/ui/Button";
-import { UploadButton } from "@/components/feature/UploadButton";
-import { Dropzone } from "@/components/feature/Dropzone";
-import { usePasteFile } from "@/hooks/usePasteFile";
-import { UploadPreview } from "@/components/feature/UploadPreview";
-import { FileList } from "@/components/feature/FileList";
-import { FilesOrderByColumn } from "@/server/routes/file";
-import { MoveUp, MoveDown } from "lucide-react";
 import Link from "next/link";
+import { trpcClientReact } from "@/utils/api";
+import { Button } from "@/components/ui/Button";
+import { useRouter } from "next/navigation";
 
-export default function Home() {
-    const [uppy] = useState(() => {
-        const uppy = new Uppy();
-        uppy.use(AWSS3, {
-            shouldUseMultipart: false,
-            getUploadParameters(file) {
-                return trpcPureClient.file.createPresignedUrl.mutate({
-                    filename:
-                        file.data instanceof File ? file.data.name : "test",
-                    contentType: file.data.type || "",
-                    size: file.size,
-                });
-            },
-        });
-        return uppy;
+export default function DashboardAppList() {
+    const getAppsResult = trpcClientReact.apps.listApps.useQuery(void 0, {
+        gcTime: Infinity,
+        staleTime: Infinity,
     });
 
-    usePasteFile({
-        onFilesPaste: (files) => {
-            uppy.addFiles(
-                files.map((file) => ({
-                    data: file,
-                }))
-            );
-        },
-    });
+    const { data: apps, isLoading } = getAppsResult;
 
-    const [orderBy, setOrderBy] = useState<
-        Exclude<FilesOrderByColumn, undefined>
-    >({
-        field: "createdAt",
-        order: "desc",
-    });
+    const router = useRouter();
 
     return (
-        <div className="mx-auto h-full">
-            <div className="container flex justify-between items-center h-[60px]">
-                <Button
-                    onClick={() => {
-                        setOrderBy((current) => ({
-                            ...current,
-                            order: current?.order === "asc" ? "desc" : "asc",
-                        }));
-                    }}
-                >
-                    Created At{" "}
-                    {orderBy.order === "desc" ? <MoveUp /> : <MoveDown />}
-                </Button>
-                <UploadButton uppy={uppy}></UploadButton>
-            </div>
-
-            <Dropzone uppy={uppy} className=" relative h-[calc(100%-60px)]">
-                {(draging) => {
-                    return (
-                        <>
-                            {draging && (
-                                <div className=" absolute inset-0 bg-secondary/50 z-10 flex justify-center items-center text-3xl">
-                                    Drop File Here to Upload
-                                </div>
-                            )}
-                            <FileList uppy={uppy} orderBy={orderBy}></FileList>
-                        </>
-                    );
-                }}
-            </Dropzone>
-            <UploadPreview uppy={uppy}></UploadPreview>
+        <div className=" w-fit mx-auto pt-10">
+            {isLoading ? (
+                <div>Loading...</div>
+            ) : (
+                <div className=" flex w-full max-w-md flex-col gap-2 rounded-md border p-2">
+                    {apps?.map((app) => (
+                        <div
+                            key={app.id}
+                            className="flex items-center justify-between gap-6"
+                        >
+                            <div>
+                                <h2 className=" text-xl">{app.name}</h2>
+                                <p className=" text-base-content/60">
+                                    {app.description
+                                        ? app.description
+                                        : "(no description)"}
+                                </p>
+                            </div>
+                            <div>
+                                <Button asChild variant="destructive">
+                                    <Link href={`/dashboard/apps/${app.id}`}>
+                                        Go
+                                    </Link>
+                                </Button>
+                            </div>
+                        </div>
+                    ))}
+                    {/* <Button asChild>
+                        <Link
+                            href="/dashboard/apps/new"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                router.push("/dashboard/apps/new");
+                            }}
+                        >
+                            Create App
+                        </Link>
+                    </Button> */}
+                </div>
+            )}
         </div>
     );
 }
