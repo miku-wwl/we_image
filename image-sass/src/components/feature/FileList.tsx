@@ -166,22 +166,21 @@ export function FileList({
     };
 
     return (
-        <ScrollArea className="h-full">
+        <ScrollArea className="h-full @container">
             {isPending && <div className="text-center">Loading</div>}
             <div
                 className={cn(
-                    "flex flex-wrap justify-center gap-4 relative container"
+                    "grid grid-cols-1 @md:grid-cols-2 @lg:grid-cols-3 @2xl:grid-cols-4 gap-4 relative container"
                 )}
             >
                 {uploadingFileIDs.length > 0 &&
                     uploadingFileIDs.map((id) => {
                         const file = uppyFiles[id];
-                        console.log(file)
 
                         return (
                             <div
                                 key={file.id}
-                                className=" w-56 h-56 flex justify-center items-center border border-red-500"
+                                className="h-56 flex justify-center items-center border border-red-500"
                             >
                                 <LocalFileItem
                                     file={file.data as File}
@@ -194,7 +193,7 @@ export function FileList({
                     return (
                         <div
                             key={file.id}
-                            className=" w-56 h-56 flex relative justify-center items-center border"
+                            className="h-56 flex relative justify-center items-center border overflow-hidden"
                         >
                             <div className="inset-0 absolute bg-background/30 opacity-0 hover:opacity-100 transition-all justify-center items-center flex">
                                 <CopyUrl url={file.url}></CopyUrl>
