@@ -2,6 +2,7 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import {
     AuthOptions,
     DefaultSession,
+    DefaultUser,
     getServerSession as nextAuthGetServerSession,
 } from "next-auth";
 import GitlabProvider from "next-auth/providers/gitlab";

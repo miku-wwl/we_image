@@ -15,15 +15,18 @@
         "package.json"
     ],
     "devDependencies": {
-        "preact": "^10.19.3",
-        "vite": "^5.0.12",
         "@preact/preset-vite": "^2.7.0",
-        "typescript": "^5.2.2",
+        "@uppy/core": "^3.8.0",
+        "preact": "^10.19.3",
         "tsup": "^8.0.1",
-        "@uppy/core": "^3.8.0"
+        "typescript": "^5.2.2",
+        "vite": "^5.0.12"
     },
     "peerDependencies": {
-        "preact": "^10.19.3",
-        "@uppy/core": "^3.8.0"
+        "@uppy/core": "^3.8.0",
+        "preact": "^10.19.3"
+    },
+    "dependencies": {
+        "@image-saas/dropzone": "file:"
     }
 }

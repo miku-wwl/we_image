@@ -9,6 +9,7 @@ import { getServerSession } from "@/server/auth";
 import { redirect } from "next/navigation";
 import { ThemeProvider } from "./ThemeProvider";
 import { ThemeToggle } from "./ThemeToggle";
+import { Plan } from "./Plan";
 
 export default async function DashboardLayout(props: {
     children: React.ReactNode;
@@ -30,14 +31,17 @@ export default async function DashboardLayout(props: {
                         <DropdownMenu>
                             <DropdownMenuTrigger>
                                 {/* <Button variant="ghost"> */}
-                                <Avatar>
-                                    <AvatarImage
-                                        src={session.user.image!}
-                                    ></AvatarImage>
-                                    <AvatarFallback>
-                                        {session.user.name?.substring(0, 2)}
-                                    </AvatarFallback>
-                                </Avatar>
+                                <div className="relative">
+                                    <Avatar>
+                                        <AvatarImage
+                                            src={session.user.image!}
+                                        ></AvatarImage>
+                                        <AvatarFallback>
+                                            {session.user.name?.substring(0, 2)}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <Plan></Plan>
+                                </div>
                                 {/* </Button> */}
                             </DropdownMenuTrigger>
                             <DropdownMenuContent>
