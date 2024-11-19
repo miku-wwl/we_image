@@ -13,6 +13,7 @@ import { FileList } from "@/components/feature/FileList";
 import { FilesOrderByColumn } from "@/server/routes/file";
 import { MoveUp, MoveDown, Settings } from "lucide-react";
 import Link from "next/link";
+import { UpgradeDialog } from "./Upgrade";
 
 export default function AppPage({
     params: { id: appId },
@@ -30,18 +31,30 @@ export default function AppPage({
 
     const currentApp = apps?.filter((app) => app.id === appId)[0];
 
+    const [showUpgrade, setShowUpgrade] = useState(false);
+
     const [uppy] = useState(() => {
         const uppy = new Uppy();
         uppy.use(AWSS3, {
             shouldUseMultipart: false,
-            getUploadParameters(file) {
-                return trpcPureClient.file.createPresignedUrl.mutate({
-                    filename:
-                        file.data instanceof File ? file.data.name : "test",
-                    contentType: file.data.type || "",
-                    size: file.size,
-                    appId: appId,
-                });
+            async getUploadParameters(file) {
+                try {
+                    const result =
+                        await trpcPureClient.file.createPresignedUrl.mutate({
+                            filename:
+                                file.data instanceof File
+                                    ? file.data.name
+                                    : "test",
+                            contentType: file.data.type || "",
+                            size: file.size,
+                            appId: appId,
+                        });
+                    return result;
+                } catch (err) {
+                    setShowUpgrade(true);
+                    // return null
+                    throw err;
+                }
             },
         });
         return uppy;
@@ -134,6 +147,10 @@ export default function AppPage({
                     }}
                 </Dropzone>
                 <UploadPreview uppy={uppy}></UploadPreview>
+                <UpgradeDialog
+                    open={showUpgrade}
+                    onOpenChange={(f) => setShowUpgrade(f)}
+                ></UpgradeDialog>
             </div>
         );
     }

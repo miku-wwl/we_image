@@ -46,9 +46,18 @@ export const protectedProcedure = withLoggerProcedure
             });
         }
 
+        const user = await db.query.users.findFirst({
+            where: (users, { eq }) => eq(users.id, ctx.session!.user.id),
+            columns: {
+                plan: true,
+            },
+        });
+        const plan = user!.plan;
+
         return next({
             ctx: {
                 session: ctx.session!,
+                plan,
             },
         });
     });

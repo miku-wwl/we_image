@@ -7,18 +7,18 @@ import {
     PutObjectCommandInput,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-import { files } from "../db/schema";
+import { apps, files } from "../db/schema";
 import { db } from "../db/db";
 import { v4 as uuid } from "uuid";
-import { and, asc, desc, eq, gt, isNull, lt, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, gt, isNull, lt, sql } from "drizzle-orm";
 import { filesCanOrderByColumns } from "../db/validate-schema";
 
 // const json = {
-//     "bucket": "test-image-1300216527",
-//     "apiEndpoint": "http://117.72.69.172:9000",
-//     "region": "ap-nanjing",
-//     "accessKeyId": "1wZk5qSlnC3asfIBJbng",
-//     "secretAccessKey": "BUXi60cz98DfKqvmdhVyCU7l90SmnLboQi18aWci"
+//     bucket: "test-image-1300216527",
+//     apiEndpoint: "https://cos.ap-nanjing.myqcloud.com",
+//     region: "ap-nanjing",
+//     accessKeyId: "AKIDBLXrx051CNXktvy6KYio6LdzGnIh4fJs",
+//     secretAccessKey: "yrqsqvux45zmT9zqaIvSvKqGapyxpaXR",
 // };
 
 const filesOrderByColumnSchema = z
@@ -61,6 +61,21 @@ export const fileRoutes = router({
             }
 
             if (app.userId !== ctx.session.user.id) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                });
+            }
+
+            const isFreePlan = ctx.plan === "free";
+
+            const alreadyUploadedFilesCountResult = await db
+                .select({ count: count() })
+                .from(apps)
+                .where(and(eq(apps.id, app.id), isNull(apps.deletedAt)));
+
+            const countNum = alreadyUploadedFilesCountResult[0].count;
+
+            if (isFreePlan && countNum >= 1) {
                 throw new TRPCError({
                     code: "FORBIDDEN",
                 });
