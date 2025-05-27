@@ -250,6 +250,10 @@ importers:
         version: 5.0.12(@types/node@20.11.16)(terser@5.27.0)
 
   packages/dropzone:
+    dependencies:
+      '@image-saas/dropzone':
+        specifier: 'file:'
+        version: 'link:'
     devDependencies:
       '@preact/preset-vite':
         specifier: ^2.7.0
