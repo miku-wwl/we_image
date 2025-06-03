@@ -1,1 +1,1 @@
-export function UpgradePage() {}
+export default function UpgradePage() {}
