@@ -71,3 +71,4 @@ CMD ["node", "server.js"]
 
 
 # 运行该镜像 docker run -p 3000:3000 nextjs-docker 
+# https://blog.eimoon.com/p/nextjs-docker-deployment-guide/  参考链接
